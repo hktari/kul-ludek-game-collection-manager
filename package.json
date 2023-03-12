@@ -17,6 +17,7 @@
     "@types/follow-redirects": "^1.14.1",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.15.0",
+    "@types/puppeteer": "^7.0.4",
     "jest": "^29.5.0",
     "prettier": "2.8.4",
     "source-map-support": "^0.5.21",
@@ -32,6 +33,7 @@
     "follow-redirects": "^1.15.2",
     "htmlparser2": "^8.0.1",
     "parse5": "^7.1.2",
+    "puppeteer": "^19.7.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   }
 }
