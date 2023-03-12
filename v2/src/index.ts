@@ -1,3 +1,9 @@
-console.log("Hello there");
+import { generateStarterSpreadsheet } from "./fileManager";
 
-export default {}
+console.log("Start");
+
+generateStarterSpreadsheet();
+
+console.log("End");
+
+export default {};
