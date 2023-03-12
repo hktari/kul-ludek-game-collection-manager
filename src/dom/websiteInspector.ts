@@ -1,25 +1,48 @@
 import * as puppeteer from "puppeteer";
 
+type TextSelector = {
+  [key: string]: string;
+};
+
 export default class WebsiteInspector {
+  private browser?: puppeteer.Browser;
+
   constructor(public url: URL) {}
 
-  async querySelectorAllInnerText(selector: string) {
+  async performQueries(
+    ...selectors: TextSelector[]
+  ): Promise<Record<string, string | undefined>> {
     try {
-      const browser = await puppeteer.launch({ headless: true });
-      const [page] = await browser.pages();
+      if (!this.browser) {
+        this.browser = await puppeteer.launch({ headless: true });
+      }
+
+      const [page] = await this.browser.pages();
 
       await page.goto(this.url.toString(), { waitUntil: "networkidle0" });
 
-      const data = await page.evaluate(() =>
-        Array.from(
-          document.querySelectorAll(
-            "div.game-header-title:nth-child(2) > div:nth-child(2) > h1:nth-child(1) > a:nth-child(1)"
-          )
-        ).map((elem) => elem.textContent)
-      );
+      const selectedData = new Map();
 
-      await browser.close();
-      return data;
+      for (const textSelector of selectors) {
+        for (const [key, selector] of Object.entries(textSelector)) {
+          try {
+            const elementText = await page.$eval(
+              selector,
+              (elem) => (elem as HTMLElement).innerText
+            );
+            selectedData.set(key, elementText);
+          } catch (error) {
+            console.error(
+              `Failed to get element innerText. Selector: ${selector}`,
+              error
+            );
+            selectedData.set(key, undefined);
+          }
+        }
+      }
+
+      await this.browser.close();
+      return Object.fromEntries(selectedData);
     } catch (err) {
       console.error(err);
       throw err;
