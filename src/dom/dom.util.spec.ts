@@ -1,4 +1,4 @@
-import { getContentAtUrl } from "./http.util";
+import { getContentAtUrl } from "./dom.util";
 
 describe("getContentAtUrl", () => {
   it("should return a string with length greater than 0", async () => {
@@ -14,4 +14,16 @@ describe("getContentAtUrl", () => {
     const invalidUrl = new URL("https://invalidUrl-rings");
     return expect(getContentAtUrl(invalidUrl)).rejects.toBeDefined();
   });
+
+  it('should follow 301 redirect responses', async () => { 
+    const redirectedUrl = new URL(
+      "https://boardgamegeek.com/boardgame/4324"
+    );
+    const content = await getContentAtUrl(redirectedUrl);
+
+    const isHtml = content.match(/<html.*>/g)
+
+    expect(isHtml).toBeTruthy();
+    
+   })
 });

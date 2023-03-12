@@ -1,10 +1,12 @@
 import http from "http";
-import { getContentAtUrl } from "./http.util";
+import { getContentAtUrl } from "./dom.util";
 import Game from "../models/game";
 import { Parser } from "htmlparser2";
 import { DomHandler } from "htmlparser2";
 import { DomUtils } from "htmlparser2";
+
 const CSSselect = require("css-select");
+
 
 export type BoardGameGeekResource = Partial<Game> & {
   timestamp: string;
@@ -30,7 +32,8 @@ export default class BoardGameGeekReader {
           let boardGGResource: BoardGameGeekResource = {
             boardGameGeekId: gameId,
             title: CSSselect.selectOne(
-              "div.game-header-title:nth-child(2) > div:nth-child(2) > h1:nth-child(1) > a:nth-child(1)"
+              ".game-header-title:nth-child(2) > div:nth-child(2) > h1:nth-child(1) > a",
+              dom
             ),
             timestamp: new Date().toISOString(),
           };
