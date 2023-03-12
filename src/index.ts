@@ -1,4 +1,9 @@
 import { generateStarterSpreadsheet } from "./fileManager";
 
+console.log("Start");
 
-generateStarterSpreadsheet()
+generateStarterSpreadsheet();
+
+console.log("End");
+
+export default {};

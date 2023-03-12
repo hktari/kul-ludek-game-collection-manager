@@ -5,8 +5,6 @@ import * as fs from "node:fs";
 
 import Game from "./models/game";
 
-XLSX.set_fs(fs);
-
 /* load 'stream' for stream support */
 // import { Readable } from "stream";
 
@@ -15,7 +13,10 @@ XLSX.set_fs(fs);
 function generateStarterSpreadsheet() {
   const rows = [new Game("0", "12932")];
   const worksheet = XLSX.utils.json_to_sheet(rows);
-  XLSX.writeFile(worksheet, "sheetjs.xlsx");
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Games");
+
+  XLSX.writeFile(workbook, "sheetjs.xlsx");
 }
 
 export { generateStarterSpreadsheet };
