@@ -26,10 +26,13 @@ export default class WebsiteInspector {
       for (const textSelector of selectors) {
         for (const [key, selector] of Object.entries(textSelector)) {
           try {
-            const elementText = await page.$eval(
+            let elementText = await page.$eval(
               selector,
               (elem) => (elem as HTMLElement).innerText
             );
+
+            elementText = elementText.trim();
+            
             selectedData.set(key, elementText);
           } catch (error) {
             console.error(
