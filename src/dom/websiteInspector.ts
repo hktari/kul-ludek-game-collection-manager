@@ -7,9 +7,10 @@ type TextSelector = {
 export default class WebsiteInspector {
   private browser?: puppeteer.Browser;
 
-  constructor(public url: URL) {}
+  constructor() {}
 
   async performQueries(
+    url: URL,
     ...selectors: TextSelector[]
   ): Promise<Record<string, string | undefined>> {
     try {
@@ -17,9 +18,9 @@ export default class WebsiteInspector {
         this.browser = await puppeteer.launch({ headless: true });
       }
 
-      const [page] = await this.browser.pages();
+      const page = await this.browser.newPage();
 
-      await page.goto(this.url.toString(), { waitUntil: "networkidle0" });
+      await page.goto(url.toString(), { waitUntil: "networkidle0" });
 
       const selectedData = new Map();
 
@@ -32,7 +33,7 @@ export default class WebsiteInspector {
             );
 
             elementText = elementText.trim();
-            
+
             selectedData.set(key, elementText);
           } catch (error) {
             console.error(
@@ -44,11 +45,16 @@ export default class WebsiteInspector {
         }
       }
 
-      await this.browser.close();
       return Object.fromEntries(selectedData);
     } catch (err) {
       console.error(err);
       throw err;
+    }
+  }
+
+  close() {
+    if (this.browser) {
+      this.browser.close();
     }
   }
 }
