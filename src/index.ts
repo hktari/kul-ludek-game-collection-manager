@@ -1,8 +1,8 @@
-import { generateStarterSpreadsheet } from "./fileManager";
+import { generateStarterSpreadsheet } from "./xlsx/spreadSheetManager";
 
 console.log("Start");
 
-generateStarterSpreadsheet();
+// generateStarterSpreadsheet();
 
 console.log("End");
 

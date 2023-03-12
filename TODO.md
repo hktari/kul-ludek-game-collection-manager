@@ -1,6 +1,6 @@
 # TODO
 - model for a game entry [OK]
-- generate table file containing headers (.ods ?)
+- generate table file containing headers (.ods ?)   [OK]
 - edit and save table file
 - parse data into an array of models
 - get DOM for given boardgamegeek id
