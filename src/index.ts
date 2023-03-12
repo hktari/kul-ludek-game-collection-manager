@@ -1,5 +1,4 @@
-export const sum = (a: number, b: number): number => {
-	const addition = a + b
+import { generateStarterSpreadsheet } from "./fileManager";
 
-  return addition;
-};
+
+generateStarterSpreadsheet()

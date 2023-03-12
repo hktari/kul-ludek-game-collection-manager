@@ -1,5 +1,5 @@
 # TODO
-- model for a game entry
+- model for a game entry [OK]
 - generate table file containing headers (.ods ?)
 - edit and save table file
 - parse data into an array of models
