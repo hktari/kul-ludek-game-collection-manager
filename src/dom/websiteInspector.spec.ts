@@ -9,11 +9,11 @@ describe("websiteInspector", () => {
       const titleSelector = `div.game-header-title:nth-child(2) > div:nth-child(2) > h1:nth-child(1) > a:nth-child(1)`;
       const websiteInspector = new WebsiteInspector(validUrl);
 
-      const titleElement = await websiteInspector.querySelectorAll(
-        titleSelector
-      );
+      const [titleElement]: (string | null)[] =
+        await websiteInspector.querySelectorAllInnerText(titleSelector);
 
       expect(titleElement).toBeDefined();
-    });
+      expect(titleElement?.match(/Risk: The Lord of the Rings /)).toBeTruthy();
+    }, 10000);
   });
 });
