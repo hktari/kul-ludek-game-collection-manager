@@ -8,6 +8,10 @@ describe("websiteInspector", () => {
       websiteInspector = new WebsiteInspector();
     });
 
+    afterEach(() => {
+      return websiteInspector.close();
+    });
+
     it("should return object with expected properties for valid url and selector", async () => {
       const validUrl = new URL(
         "https://boardgamegeek.com/boardgame/4324/risk-lord-rings"
@@ -98,10 +102,14 @@ describe("websiteInspector", () => {
         })
       );
 
-      results.forEach((result, idx) => {
+      results.forEach((promisedResult, idx) => {
         const [_, __, expectedResult] = queryRequests[idx];
+        const result =
+          promisedResult.status === "fulfilled"
+            ? promisedResult.value
+            : promisedResult.reason;
         expect(result).toMatchObject(expectedResult);
       });
-    });
+    }, 15000);
   });
 });

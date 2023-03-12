@@ -54,7 +54,8 @@ export default class WebsiteInspector {
 
   close() {
     if (this.browser) {
-      this.browser.close();
+      return this.browser.close();
     }
+    return Promise.resolve();
   }
 }
