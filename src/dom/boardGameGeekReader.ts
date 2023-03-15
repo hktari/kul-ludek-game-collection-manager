@@ -53,7 +53,7 @@ export default class BoardGameGeekReader {
       minAge = +websiteData.minAge
     }
 
-    const game: BoardGameGeekResource = {
+    const game: Partial<BoardGameGeekResource> = {
       title: websiteData.title,
       description: websiteData.description,
       minAge,
@@ -62,7 +62,6 @@ export default class BoardGameGeekReader {
       genre: websiteData.categories,
       publisher: websiteData.publisher,
       releaseDateYear: websiteData.releaseDateYear,
-      timestamp: Date.now().toString()
     }
 
     return game;
@@ -74,8 +73,14 @@ export default class BoardGameGeekReader {
       const resourceUri = `/boardgame/${gameId}`;
       const gameUrl = new URL(resourceUri, this.baseUrl);
 
-      const websiteData = await this.websiteInspector.performQueries(gameUrl, ...this._getSelectorsForGame())
+      const [websiteData, errors] = await this.websiteInspector.performQueries(gameUrl, ...this._getSelectorsForGame())
 
+      const gameResource = this._parseDataIntoGame(websiteData)
+
+      gameResource.timestamp = new Date().toISOString()
+      gameResource.errors = errors && Object.entries(errors).map((attr, err) => `${[attr]}: ${err}`).join('\n')
+      
+      return gameResource
     });
   }
 }
