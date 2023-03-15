@@ -5,6 +5,8 @@ import { Parser } from "htmlparser2";
 import { DomHandler } from "htmlparser2";
 import { DomUtils } from "htmlparser2";
 import WebsiteInspector, { PropertyCSSSelector, SelectedWebData } from "./websiteInspector";
+import { parseMinMaxPlayers } from "./boardGameGeekReader.util";
+import { off } from "process";
 
 const CSSselect = require("css-select");
 
@@ -12,6 +14,7 @@ const CSSselect = require("css-select");
 export type BoardGameGeekResource = Partial<Game> & {
   timestamp: string;
 };
+
 
 export default class BoardGameGeekReader {
   private websiteInspector: WebsiteInspector;
@@ -38,10 +41,28 @@ export default class BoardGameGeekReader {
     ]
   }
 
-  private _parseDataIntoGame(websiteData: SelectedWebData){
 
+  private _parseDataIntoGame(websiteData: SelectedWebData) {
+    let minPlayers, maxPlayers;
+    if (websiteData.minMaxPlayers) {
+      [minPlayers, maxPlayers] = parseMinMaxPlayers(websiteData.minMaxPlayers)
+    }
+
+    let minAge;
+    if (websiteData.minAge) {
+      minAge = +websiteData.minAge
+    }
+
+    const game: BoardGameGeekResource = {
+      title: websiteData.title,
+      description: websiteData.description,
+      minAge,
+      minPlayers,
+      maxPlayers,
+      timestamp: Date.now().toString()
+    }
   }
-  
+
 
   getResourceForGameId(gameId: string) {
     return new Promise<BoardGameGeekResource>(async (resolve, reject) => {
