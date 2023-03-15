@@ -59,8 +59,13 @@ export default class BoardGameGeekReader {
       minAge,
       minPlayers,
       maxPlayers,
+      genre: websiteData.categories,
+      publisher: websiteData.publisher,
+      releaseDateYear: websiteData.releaseDateYear,
       timestamp: Date.now().toString()
     }
+
+    return game;
   }
 
 

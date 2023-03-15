@@ -13,7 +13,7 @@ export default class Game {
     public maxPlaytime?: number,
     public developer?: string,
     public publisher?: string,
-    public releaseDateISO?: string,
+    public releaseDateYear?: string,
     public errors?: string
   ) {}
 }
