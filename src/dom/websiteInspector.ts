@@ -1,18 +1,39 @@
 import * as puppeteer from "puppeteer";
 
-type TextSelector = {
+/**
+ * Represents the CSS selector for a object property with given name.
+ * Key is property name
+ * Value is CSS selector
+ */
+export type PropertyCSSSelector = {
   [key: string]: string;
 };
 
+/**
+ * The result of selecting data from a website.
+ * Key is given property name
+ * Value is the text content of the DOM Element selected or undefined if none was found
+ */
+export type SelectedWebData = Record<string, string | undefined>
+
+/**
+ * Uses browser automation to open up a website and perform data queries with css
+ */
 export default class WebsiteInspector {
   private browser?: puppeteer.Browser;
 
-  constructor() {}
+  constructor() { }
 
+  /**
+   * 
+   * @param url the website URL
+   * @param selectors the selectors with which to extract data into the resulting object
+   * @returns The data selected from the given website and mapped to object properties
+   */
   async performQueries(
     url: URL,
-    ...selectors: TextSelector[]
-  ): Promise<Record<string, string | undefined>> {
+    ...selectors: PropertyCSSSelector[]
+  ): Promise<SelectedWebData> {
     try {
       if (!this.browser) {
         this.browser = await puppeteer.launch({ headless: true });
