@@ -4,24 +4,24 @@ import {
 } from "./spreadSheetManager";
 import fs from "fs";
 import Game from "../models/game";
+import path from "path";
 
 describe("spreadSheetManager", () => {
-  const starterFileName = "test";
-  const starterFilePath = `./${starterFileName}.xlsx`;
+  const filePath = path.join("test.xlsx");
 
   describe("generateStarterSpreadsheet", () => {
     it('should create a file name "test.xlsx', () => {
-      generateStarterSpreadsheet(starterFileName);
+      generateStarterSpreadsheet(path.parse(filePath));
 
-      expect(fs.existsSync(starterFilePath)).toBeTruthy();
+      expect(fs.existsSync(filePath)).toBeTruthy();
     });
 
     it("should create a file given a directory path + name", () => {
-      const fileNameSubdir = "./output/test";
-      generateStarterSpreadsheet(fileNameSubdir);
-      const filePath = `./${fileNameSubdir}.xlsx`;
+      const filePathSubdir = path.join("output", "test.xlsx");
 
-      expect(fs.existsSync(filePath)).toBeTruthy();
+      generateStarterSpreadsheet(path.parse(filePathSubdir));
+
+      expect(fs.existsSync(filePathSubdir)).toBeTruthy();
     });
   });
 
@@ -29,7 +29,7 @@ describe("spreadSheetManager", () => {
     let gamesArray: Game[];
 
     beforeEach(() => {
-      gamesArray = readInSpreadsheet(starterFilePath);
+      gamesArray = readInSpreadsheet(filePath);
     });
 
     it("should return an array with a single entry", () => {

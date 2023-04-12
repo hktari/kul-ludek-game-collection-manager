@@ -5,17 +5,16 @@ import path from "path";
 
 function _stripExtension(filePath: string) {}
 
-function generateStarterSpreadsheet(filePath: string) {
+function generateStarterSpreadsheet(filePath: path.ParsedPath) {
   const rows = [new Game("0", "0")];
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Games");
 
-  const parsedPath = path.parse(filePath);
-  const outFilePath = `${path.join(parsedPath.dir, parsedPath.name)}.xlsx`;
+  const outFilePath = `${path.join(filePath.dir, filePath.name)}.xlsx`;
 
-  if (parsedPath.dir && !fs.existsSync(parsedPath.dir)) {
-    fs.mkdirSync(parsedPath.dir);
+  if (filePath.dir && !fs.existsSync(filePath.dir)) {
+    fs.mkdirSync(filePath.dir);
   }
 
   XLSX.writeFile(workbook, outFilePath);
