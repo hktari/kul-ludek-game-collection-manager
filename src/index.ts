@@ -68,6 +68,8 @@ program
     console.log("Done.");
   });
 
-program.parse();
+(async function () {
+  await program.parseAsync();
+})();
 
 export default {};
