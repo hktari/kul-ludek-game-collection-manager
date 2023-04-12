@@ -16,18 +16,8 @@ export const sampleGame: Game = Object.assign(new Game("0", "4324"), {
 });
 
 function generateStarterSpreadsheet(filePath: path.ParsedPath) {
-  const rows = [sampleGame];
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Games");
-
-  const outFilePath = `${path.join(filePath.dir, filePath.name)}.xlsx`;
-
-  if (filePath.dir && !fs.existsSync(filePath.dir)) {
-    fs.mkdirSync(filePath.dir);
-  }
-
-  XLSX.writeFile(workbook, outFilePath);
+  const games = [sampleGame];
+  writeSpreadsheet(games, filePath);
 }
 
 function _parseGame(gameProps: any) {
@@ -46,6 +36,25 @@ function readInSpreadsheet(filePath: path.ParsedPath): Game[] {
   return gamesPlain
     .map((gameProps) => _parseGame(gameProps))
     .filter((game) => game); // remove undefined
+}
+
+/**
+ * Writes given game data to the given file path. This will overwrite any existing data.
+ * @param games game data to be written
+ * @param filePath spreadsheet output file path
+ */
+function writeSpreadsheet(games: Game[], filePath: path.ParsedPath) {
+  const worksheet = XLSX.utils.json_to_sheet(games);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Games");
+
+  const outFilePath = `${path.join(filePath.dir, filePath.name)}.xlsx`;
+
+  if (filePath.dir && !fs.existsSync(filePath.dir)) {
+    fs.mkdirSync(filePath.dir);
+  }
+
+  XLSX.writeFile(workbook, outFilePath);
 }
 
 export { generateStarterSpreadsheet, readInSpreadsheet };
