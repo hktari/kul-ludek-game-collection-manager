@@ -18,7 +18,7 @@ export type SelectedWebData = Record<string, string | undefined>;
 
 export type SelectionErrors = Record<string, string>;
 
-export type QueryResult = [SelectedWebData, SelectionErrors];
+export type QueryResult = [SelectedWebData, SelectionErrors | undefined];
 /**
  * Uses browser automation to open up a website and perform data queries with css
  */
@@ -27,7 +27,9 @@ export default class WebsiteInspector {
 
   constructor() {}
 
-  private _mapToObjectOrUndefined(map: Map<any, any>) {
+  private _mapToObjectOrUndefined(
+    map: Map<any, any>
+  ): SelectionErrors | undefined {
     return map.size === 0 ? undefined : Object.fromEntries(map);
   }
   /**
