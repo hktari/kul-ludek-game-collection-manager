@@ -1,6 +1,12 @@
-import { generateStarterSpreadsheet } from "./xlsx/spreadSheetManager";
+import {
+  generateStarterSpreadsheet,
+  readInSpreadsheet,
+} from "./xlsx/spreadSheetManager";
 import { Command } from "commander";
 import path from "path";
+import Game from "./interface/game";
+import BoardGameGeekReader from "./dom/boardGameGeekReader";
+import util from "util";
 
 const program = new Command();
 
@@ -31,6 +37,7 @@ program
       )}' for your game collection...`
     );
 
+    generateStarterSpreadsheet(filePathParsed);
     console.log("Done.");
   });
 
@@ -43,6 +50,9 @@ program
   .action((inputFile, options) => {
     console.log(`Parsing file ${inputFile}...`);
 
+    const filePathParsed = path.parse(inputFile);
+
+    const games = readInSpreadsheet(filePathParsed);
     console.log("Done.");
   });
 
