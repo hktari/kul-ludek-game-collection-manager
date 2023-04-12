@@ -5,7 +5,7 @@ import path from "path";
 
 function _stripExtension(filePath: string) {}
 
-const sampleGame: Game = Object.assign(new Game("0", "4324"), {
+export const sampleGame: Game = Object.assign(new Game("0", "4324"), {
   boardGameGeekId: "4324",
   title: "Risk: The Lord of the Rings",
   description:
@@ -40,8 +40,8 @@ function _parseGame(gameProps: any) {
   return Object.assign(game, gameProps);
 }
 
-function readInSpreadsheet(filePath: string): Game[] {
-  const workbook = XLSX.readFile(filePath);
+function readInSpreadsheet(filePath: path.ParsedPath): Game[] {
+  const workbook = XLSX.readFile(path.format(filePath));
   const gamesPlain = XLSX.utils.sheet_to_json(workbook.Sheets["Games"]);
   return gamesPlain
     .map((gameProps) => _parseGame(gameProps))

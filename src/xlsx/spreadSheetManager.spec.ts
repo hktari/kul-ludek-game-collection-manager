@@ -1,6 +1,7 @@
 import {
   generateStarterSpreadsheet,
   readInSpreadsheet,
+  sampleGame,
 } from "./spreadSheetManager";
 import fs from "fs";
 import Game from "../models/game";
@@ -29,7 +30,7 @@ describe("spreadSheetManager", () => {
     let gamesArray: Game[];
 
     beforeEach(() => {
-      gamesArray = readInSpreadsheet(filePath);
+      gamesArray = readInSpreadsheet(path.parse(filePath));
     });
 
     it("should return an array with a single entry", () => {
@@ -37,9 +38,9 @@ describe("spreadSheetManager", () => {
       expect(gamesArray.length).toBe(1);
     });
 
-    it("should return an object of type Game", () => {
+    it("should return the sample object of type Game", () => {
       const game = gamesArray[0];
-      expect(game).toMatchObject<Game>({ id: "0", boardGameGeekId: "0" });
+      expect(game).toMatchObject<Game>(sampleGame);
       expect(game instanceof Game).toBeTruthy();
     });
   });
