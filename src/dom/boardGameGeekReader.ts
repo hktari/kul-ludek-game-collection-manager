@@ -10,6 +10,7 @@ import WebsiteInspector, {
 } from "./websiteInspector";
 import { parseMinMaxPlayers } from "./boardGameGeekReader.util";
 import { off } from "process";
+import { timingSafeEqual } from "crypto";
 
 const CSSselect = require("css-select");
 
@@ -95,6 +96,7 @@ export default class BoardGameGeekReader {
       );
 
       const gameResource: BoardGameGeekResource = {
+        boardGameGeekId: gameId,
         timestamp: new Date().toISOString(),
         errors:
           errors &&
@@ -103,6 +105,8 @@ export default class BoardGameGeekReader {
             .join("\n"),
         ...this._parseDataIntoGame(websiteData),
       };
+
+      this.websiteInspector.close();
 
       return resolve(gameResource);
     });
