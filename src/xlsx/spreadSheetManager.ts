@@ -57,4 +57,4 @@ function writeSpreadsheet(games: Game[], filePath: path.ParsedPath) {
   XLSX.writeFile(workbook, outFilePath);
 }
 
-export { generateStarterSpreadsheet, readInSpreadsheet };
+export { generateStarterSpreadsheet, readInSpreadsheet, writeSpreadsheet };

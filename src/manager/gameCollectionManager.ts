@@ -1,5 +1,5 @@
-import BoardGameGeekReader from "@src/dom/boardGameGeekReader";
-import Game from "@src/models/game";
+import BoardGameGeekReader from "../dom/boardGameGeekReader";
+import Game from "../models/game";
 
 export default class GameCollectionManager {
   readonly boardGameReader: BoardGameGeekReader;
@@ -25,7 +25,7 @@ export default class GameCollectionManager {
         if (result.status === "fulfilled") {
           const gameUpdateData = result.value;
           const gameToUpdate: Game | undefined = games.find(
-            (game) => game.id === gameUpdateData.id
+            (game) => game.boardGameGeekId === gameUpdateData.boardGameGeekId
           );
 
           if (!gameToUpdate) {

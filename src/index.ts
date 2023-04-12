@@ -1,12 +1,14 @@
 import {
   generateStarterSpreadsheet,
   readInSpreadsheet,
+  writeSpreadsheet,
 } from "./xlsx/spreadSheetManager";
 import { Command } from "commander";
 import path from "path";
-import Game from "./interface/game";
+import Game from "./models/game";
 import BoardGameGeekReader from "./dom/boardGameGeekReader";
 import util from "util";
+import GameCollectionManager from "./manager/gameCollectionManager";
 
 const program = new Command();
 
@@ -47,12 +49,22 @@ program
     "Updates a spreadsheet file with newest data pulled from the web."
   )
   .argument("<input-file>", "Your board game collection in a .xlsx file")
-  .action((inputFile, options) => {
+  .action(async (inputFile, options) => {
     console.log(`Parsing file ${inputFile}...`);
 
     const filePathParsed = path.parse(inputFile);
 
     const games = readInSpreadsheet(filePathParsed);
+
+    const bgcm = new GameCollectionManager();
+    console.log("updating...");
+    const updatedGames = await bgcm.update(games);
+
+    console.log("saving...");
+    const outFileName = `${filePathParsed.name}-updated${filePathParsed.ext}`;
+    const outputPath = path.join(filePathParsed.dir, outFileName);
+    writeSpreadsheet(updatedGames, path.parse(outputPath));
+
     console.log("Done.");
   });
 
