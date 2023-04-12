@@ -5,8 +5,18 @@ import path from "path";
 
 function _stripExtension(filePath: string) {}
 
+const sampleGame: Game = Object.assign(new Game("0", "4324"), {
+  boardGameGeekId: "4324",
+  title: "Risk: The Lord of the Rings",
+  description:
+    'A Lord-of-the-Rings-themed version of Risk, with the following differences:\n\nThe map is of Middle Earth, and the tokens represent armies of that fictional world.\n(Note that in this "Two Towers edition", the first version of the game, the map is incomplete, unless you own the expansion. For the newer version with complete map, see the reimplementation of this, the "trilogy edition".)\n\nYou play either good or evil.\n\nLeaders, missions and sites of power have been added.\n\nThe One Ring acts as a timing mechanism, when it leaves the board, the game ends.\n\nComponents for this "Two Towers edition":\n("trilogy edition" has 90 per army)\n\n40 Elven Archers/Orcs\n12 Riders of Rohan/Dark Riders\n6 Eagles/Cave Trolls\n2 shields per color\n\nGameboard\n4 Complete armies in different colors: (60 per color)\n42 Territory Cards (9 Good, 9 Evil, 24 Neutral)\n2 Wild Cards\n40 Adventure Cards\nThe One Ring\n3 Red Dice\n2 Black Dice',
+  genre: "Adventure",
+  publisher: "Hasbro",
+  releaseDateYear: "(2002)",
+});
+
 function generateStarterSpreadsheet(filePath: path.ParsedPath) {
-  const rows = [new Game("0", "0")];
+  const rows = [sampleGame];
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Games");
