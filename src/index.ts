@@ -1,6 +1,10 @@
 import { generateStarterSpreadsheet } from "./xlsx/spreadSheetManager";
 import { Command } from "commander";
+import path from "path";
+
 const program = new Command();
+
+const outputDir = "output";
 
 program
   .name("gcm")
@@ -8,6 +12,27 @@ program
     `Game Collection Manager manages a spreadsheet file. Updating it with data from board game websites. The resulting spreadsheet can be used to search and manage your board game collection`
   )
   .version("0.1.0");
+
+program
+  .command("generate-starter")
+  .description("Generate a starter spreadsheet file with relevant headers.")
+  .argument(
+    "[output-file]",
+    "The path where the generated file will be saved.",
+    path.join(outputDir, "game-collection.xlsx")
+  )
+  .action((fileName, options) => {
+    const filePathParsed = path.parse(fileName);
+
+    console.log(
+      `Generating a starter spreadsheet file at '${path.join(
+        filePathParsed.dir,
+        filePathParsed.base
+      )}' for your game collection...`
+    );
+
+    console.log("Done.");
+  });
 
 program
   .command("update")
@@ -18,7 +43,7 @@ program
   .action((inputFile, options) => {
     console.log(`Parsing file ${inputFile}...`);
 
-    console.log('Done.')
+    console.log("Done.");
   });
 
 program.parse();
