@@ -14,9 +14,7 @@ import { timingSafeEqual } from "crypto";
 
 const CSSselect = require("css-select");
 
-export type BoardGameGeekResource = Partial<Game> & {
-  timestamp: string;
-};
+export type BoardGameGeekResource = Partial<Game>
 
 export default class BoardGameGeekReader {
   private websiteInspector: WebsiteInspector;
@@ -85,7 +83,7 @@ export default class BoardGameGeekReader {
     return game;
   }
 
-  getResourceForGameId(gameId: string) {
+  getResourceForGameId(gameId: string) : Promise<BoardGameGeekResource> {
     return new Promise<BoardGameGeekResource>(async (resolve, reject) => {
       const resourceUri = `/boardgame/${gameId}`;
       const gameUrl = new URL(resourceUri, this.baseUrl);
@@ -97,7 +95,6 @@ export default class BoardGameGeekReader {
 
       const gameResource: BoardGameGeekResource = {
         boardGameGeekId: gameId,
-        timestamp: new Date().toISOString(),
         errors:
           errors &&
           Object.entries(errors)

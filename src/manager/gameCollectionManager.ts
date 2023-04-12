@@ -10,30 +10,41 @@ export default class GameCollectionManager {
     );
   }
 
+  private _addTimestamp(game: Game) {
+    game.lastUpdateTimestamp = new Date().toISOString();
+  }
+
   update(games: Game[]): Promise<Game[]> {
     const gameUpdates = games.map((game) =>
       this.boardGameReader.getResourceForGameId(game.boardGameGeekId)
     );
 
     return Promise.allSettled(gameUpdates).then((results) => {
-      const updatedGames: Game[] = [];
-      results.forEach((result) => {
+      const gameUpdateResults: Game[] = [];
+      results.forEach((result, resultIdx) => {
         if (result.status === "fulfilled") {
           const gameUpdateData = result.value;
           const gameToUpdate: Game | undefined = games.find(
             (game) => game.id === gameUpdateData.id
           );
-          
+
           if (!gameToUpdate) {
             throw new Error(`Failed to update game ${gameUpdateData.id}`);
           }
-          
+
           const updatedGame = Object.assign(gameToUpdate, gameUpdateData);
-          updatedGames.push(updatedGame);
+          this._addTimestamp(updatedGame);
+          gameUpdateResults.push(updatedGame);
+        } else {
+          // any remaining unhandled errors
+          const unupdatedGame = games[resultIdx];
+          unupdatedGame.errors = result.reason;
+          this._addTimestamp(unupdatedGame);
+          gameUpdateResults.push(unupdatedGame);
         }
       });
 
-      return updatedGames;
+      return gameUpdateResults;
     });
   }
 }

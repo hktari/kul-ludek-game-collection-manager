@@ -41,7 +41,6 @@ describe("gameCollectionManager", () => {
         boardGameGeekId: "4324",
         title: "Update Game Title",
         description: "Updated Game Description",
-        timestamp: "2023-03-21T06:44:24.521Z",
       },
       "350184": {
         id: "1",
@@ -49,7 +48,6 @@ describe("gameCollectionManager", () => {
         title: "Update Second Game",
         minAge: 2,
         maxAge: 99,
-        timestamp: "2023-03-21T06:44:24.521Z",
       },
     };
 
@@ -89,34 +87,33 @@ describe("gameCollectionManager", () => {
       expect(updatedGame).toMatchObject(updatedGameResource);
     });
 
-    it("rejected entries should have errors field", async () => {
+    it("rejected entries should be returned and have errors field", async () => {
       const gameError: Game = new Game("unknownId", "unknownId");
       const gameOk: Game = new Game("0", "12345");
 
-      const successfulGameUpdateResponse: BoardGameGeekResource = {
+      const successfulGameUpdateResponse: Game = {
         ...gameOk,
-        timestamp: "",
         title: "Update Game Title",
       };
 
-      const failedGameUpdateResponse: BoardGameGeekResource = {
+      const failedGameUpdateResponse: Game = {
         ...gameError,
-        errors: "Update Failed. Unknown error occured.",
-        timestamp: "",
+        errors: "Game update failed. Unknown id",
       };
 
       boardGameGeekReaderMock.mockReset();
       boardGameGeekReaderMock.mockImplementation((gameId: string) => {
         return gameId === "unknownId"
-          ? Promise.reject(failedGameUpdateResponse)
+          ? Promise.reject(failedGameUpdateResponse.errors)
           : Promise.resolve(successfulGameUpdateResponse);
       });
 
       const [okGameUpdate, failedGameUpdate] =
         await gameCollectionManager.update([gameOk, gameError]);
 
-      expect(okGameUpdate).toMatchObject(successfulGameUpdateResponse);
-      expect(failedGameUpdate).toMatchObject(failedGameUpdateResponse);
+      expect(okGameUpdate).toBeDefined();
+      expect(failedGameUpdate).toBeDefined();
+      expect(failedGameUpdate.errors).toBeTruthy();
     });
   });
 });

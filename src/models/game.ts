@@ -14,6 +14,7 @@ export default class Game {
     public developer?: string,
     public publisher?: string,
     public releaseDateYear?: string,
-    public errors?: string
+    public errors?: string,
+    public lastUpdateTimestamp?: string
   ) {}
 }
