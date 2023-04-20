@@ -5,5 +5,6 @@
 - get DOM for given boardgamegeek id [OK]
 - get value for given boardgamegeek DOM selector [OK]
 - add main programme interface (command line arguments)
+- update model
 - edit and save table file
 - log errors occured during processing an entry into the 'errors' column
