@@ -1,4 +1,4 @@
-import WebsiteInspector from "./websiteInspector";
+import WebsiteInspector, { QueryResult } from "./websiteInspector";
 
 describe("websiteInspector", () => {
   describe("performQueries", () => {
@@ -28,7 +28,7 @@ describe("websiteInspector", () => {
       expect(result.title).toMatch(/Risk: The Lord of the Rings/)
       expect(result.minMaxPlayers).toBe('2–4')
       expect(result.gameLength).toBe('120 Min')
-    }, 10000);
+    });
 
     it("should handle 5 simultaneous calls successfully", async () => {
       const queryRequests: [
@@ -75,12 +75,10 @@ describe("websiteInspector", () => {
 
       results.forEach((promisedResult, idx) => {
         const [_, __, expectedResult] = queryRequests[idx];
-        const result =
-          promisedResult.status === "fulfilled"
-            ? promisedResult.value
-            : promisedResult.reason;
-        expect(result).toMatchObject(expectedResult);
+        expect(promisedResult.status).toBe('fulfilled')
+        const [selectedWebData, err] = (promisedResult as PromiseFulfilledResult<QueryResult>).value
+        expect(selectedWebData).toMatchObject(expectedResult)
       });
-    }, 15000);
+    });
   });
 });
