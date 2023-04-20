@@ -4,7 +4,8 @@
 - parse data into an array of models [OK]
 - get DOM for given boardgamegeek id [OK]
 - get value for given boardgamegeek DOM selector [OK]
-- add main programme interface (command line arguments)
-- update model
-- edit and save table file
+- update model [OK]
+- add main programme interface (command line arguments) [OK]
+- edit and save table file [OK]
+- minAge and minPlayers are NaN
 - log errors occured during processing an entry into the 'errors' column
