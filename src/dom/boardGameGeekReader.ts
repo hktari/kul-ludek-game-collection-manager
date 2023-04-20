@@ -83,29 +83,27 @@ export default class BoardGameGeekReader {
     return game;
   }
 
-  getResourceForGameId(gameId: string) : Promise<BoardGameGeekResource> {
-    return new Promise<BoardGameGeekResource>(async (resolve, reject) => {
-      const resourceUri = `/boardgame/${gameId}`;
-      const gameUrl = new URL(resourceUri, this.baseUrl);
+  async getResourceForGameId(gameId: string): Promise<BoardGameGeekResource> {
+    const resourceUri = `/boardgame/${gameId}`;
+    const gameUrl = new URL(resourceUri, this.baseUrl);
 
-      const [websiteData, errors] = await this.websiteInspector.performQueries(
-        gameUrl,
-        ...this._getSelectorsForGame()
-      );
+    const [websiteData, errors] = await this.websiteInspector.performQueries(
+      gameUrl,
+      ...this._getSelectorsForGame()
+    );
 
-      const gameResource: BoardGameGeekResource = {
-        boardGameGeekId: gameId,
-        errors:
-          errors &&
-          Object.entries(errors)
-            .map((attr, err) => `${[attr]}: ${err}`)
-            .join("\n"),
-        ...this._parseDataIntoGame(websiteData),
-      };
+    const gameResource: BoardGameGeekResource = {
+      boardGameGeekId: gameId,
+      errors:
+        errors &&
+        Object.entries(errors)
+          .map((attr, err) => `${[attr]}: ${err}`)
+          .join("\n"),
+      ...this._parseDataIntoGame(websiteData),
+    };
 
-      this.websiteInspector.close();
+    this.websiteInspector.close();
 
-      return resolve(gameResource);
-    });
+    return gameResource;
   }
 }
