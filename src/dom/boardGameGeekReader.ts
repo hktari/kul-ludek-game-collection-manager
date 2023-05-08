@@ -7,14 +7,16 @@ import { DomUtils } from "htmlparser2";
 import WebsiteInspector, {
   PropertyCSSSelector,
   SelectedWebData,
+  SelectionErrors,
 } from "./websiteInspector";
 import { parseMinAge, parseMinMaxPlayers } from "./boardGameGeekReader.util";
+import merge from "lodash/fp/merge";
 
 export type BoardGameGeekResource = Partial<Game>;
 
 export default class BoardGameGeekReader {
   private websiteInspector: WebsiteInspector;
-  private parseErrors: Map<string, string> = new Map<string, string>();
+  private parseErrors: Map<string, string[]> = new Map<string, string[]>();
 
   constructor(public baseUrl: string) {
     this.websiteInspector = new WebsiteInspector();
@@ -97,22 +99,34 @@ export default class BoardGameGeekReader {
     return game;
   }
 
+  _errorsToString(errors: Record<string, string[]>) {
+    return Object.entries(errors)
+      .map((attr, err) => `${[attr]}: ${err}`)
+      .join("\n");
+  }
+
+  _combineErrors(queryErrors: SelectionErrors): Record<string, string[]> {
+    const parseErrorsObj = Object.fromEntries(this.parseErrors.entries());
+    if (queryErrors) {
+      return merge(parseErrorsObj, queryErrors);
+    } else {
+      return parseErrorsObj;
+    }
+  }
+
   async getResourceForGameId(gameId: string): Promise<BoardGameGeekResource> {
     const resourceUri = `/boardgame/${gameId}`;
     const gameUrl = new URL(resourceUri, this.baseUrl);
 
-    const [websiteData, errors] = await this.websiteInspector.performQueries(
-      gameUrl,
-      ...this._getSelectorsForGame()
-    );
+    const [websiteData, queryErrors] =
+      await this.websiteInspector.performQueries(
+        gameUrl,
+        ...this._getSelectorsForGame()
+      );
 
     const gameResource: BoardGameGeekResource = {
       boardGameGeekId: gameId,
-      errors:
-        errors &&
-        Object.entries(errors)
-          .map((attr, err) => `${[attr]}: ${err}`)
-          .join("\n"),
+      errors: this._combineErrors(queryErrors),
       ...this._parseDataIntoGame(websiteData),
     };
 
