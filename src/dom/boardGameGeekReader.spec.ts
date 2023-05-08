@@ -8,4 +8,5 @@ describe("boardGameGeekReader", () => {
     boardGGReader = new BoardGameGeekReader("https://boardgamegeek.com");
   });
 
+  
 });

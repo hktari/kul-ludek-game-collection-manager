@@ -12,6 +12,7 @@ import WebsiteInspector, {
 import { parseMinAge, parseMinMaxPlayers } from "./boardGameGeekReader.util";
 import merge from "lodash/fp/merge";
 import BoardGameGeekReaderParser from "./boardGameGeekReaderParsers";
+import BoardGameGeekErrorParser from "./boardGameGeekErrorParser";
 
 export type BoardGameGeekResource = Partial<Game>;
 
@@ -56,39 +57,6 @@ export default class BoardGameGeekReader {
     ];
   }
 
-  _errorsToString(errors: Record<string, string[]>) {
-    return Object.entries(errors)
-      .map((attr, err) => `${[attr]}: ${err}`)
-      .join("\n");
-  }
-
-  _combineErrors(
-    parseErrors: Record<string, string> | undefined,
-    queryErrors: SelectionErrors
-  ): Record<string, string[]> {
-    const combinedErrors: Record<string, string[]> = {};
-
-    if (parseErrors) {
-      for (const [propertyName, parseErrorMessage] of Object.entries(
-        parseErrors
-      )) {
-        combinedErrors[propertyName] = [parseErrorMessage];
-      }
-    }
-
-    if (queryErrors) {
-      for (const [propertyName, queryErrorMessage] of Object.entries(
-        queryErrors
-      )) {
-        const errorsArr = combinedErrors[propertyName] || [];
-        errorsArr.push(queryErrorMessage);
-        combinedErrors[propertyName] = errorsArr;
-      }
-    }
-
-    return combinedErrors;
-  }
-
   async getResourceForGameId(gameId: string): Promise<BoardGameGeekResource> {
     const resourceUri = `/boardgame/${gameId}`;
     const gameUrl = new URL(resourceUri, this.baseUrl);
@@ -102,8 +70,15 @@ export default class BoardGameGeekReader {
     const parser = new BoardGameGeekReaderParser();
     const [partialGameResource, parseErrors] = parser.parse(websiteData);
 
-    const parseAndQueryErrors = this._combineErrors(parseErrors, queryErrors);
-    const errorsStr = this._errorsToString(parseAndQueryErrors);
+    const errorParser = new BoardGameGeekErrorParser();
+    if (queryErrors) {
+      errorParser.add(queryErrors);
+    }
+    if (parseErrors) {
+      errorParser.add(parseErrors);
+    }
+
+    const errorsStr = errorParser.parse();
 
     const gameResource: BoardGameGeekResource = {
       boardGameGeekId: gameId,
