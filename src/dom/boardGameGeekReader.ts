@@ -67,8 +67,8 @@ export default class BoardGameGeekReader {
         ...this._getSelectorsForGame()
       );
 
-    const parser = new BoardGameGeekReaderParser();
-    const [partialGameResource, parseErrors] = parser.parse(websiteData);
+    const resourceParser = new BoardGameGeekReaderParser();
+    const [partialGameResource, parseErrors] = resourceParser.parse(websiteData);
 
     const errorParser = new BoardGameGeekErrorParser();
     if (queryErrors) {
