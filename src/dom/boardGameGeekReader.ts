@@ -8,16 +8,13 @@ import WebsiteInspector, {
   PropertyCSSSelector,
   SelectedWebData,
 } from "./websiteInspector";
-import { parseMinMaxPlayers } from "./boardGameGeekReader.util";
-import { off } from "process";
-import { timingSafeEqual } from "crypto";
+import { parseMinAge, parseMinMaxPlayers } from "./boardGameGeekReader.util";
 
-const CSSselect = require("css-select");
-
-export type BoardGameGeekResource = Partial<Game>
+export type BoardGameGeekResource = Partial<Game>;
 
 export default class BoardGameGeekReader {
   private websiteInspector: WebsiteInspector;
+  private parseErrors: Map<string, string> = new Map<string, string>();
 
   constructor(public baseUrl: string) {
     this.websiteInspector = new WebsiteInspector();
@@ -58,15 +55,32 @@ export default class BoardGameGeekReader {
     ];
   }
 
+  private _performParseDataProperty(
+    propertyName: string,
+    parserFunction: VoidFunction
+  ) {
+    try {
+      parserFunction();
+    } catch (error: any) {
+      this.parseErrors.set(propertyName, error.toString());
+    }
+  }
+
   private _parseDataIntoGame(websiteData: SelectedWebData) {
     let minPlayers, maxPlayers;
     if (websiteData.minMaxPlayers) {
-      [minPlayers, maxPlayers] = parseMinMaxPlayers(websiteData.minMaxPlayers);
+      const minMaxPlayersRaw = websiteData.minMaxPlayers;
+      this._performParseDataProperty("minMaxPlayers", () => {
+        [minPlayers, maxPlayers] = parseMinMaxPlayers(minMaxPlayersRaw);
+      });
     }
 
     let minAge;
     if (websiteData.minAge) {
-      minAge = +websiteData.minAge;
+      const minAgeRaw = websiteData.minAge;
+      this._performParseDataProperty("minAge", () => {
+        minAge = parseMinAge(minAgeRaw);
+      });
     }
 
     const game: Partial<BoardGameGeekResource> = {
