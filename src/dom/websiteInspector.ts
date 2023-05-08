@@ -16,9 +16,9 @@ export type PropertyCSSSelector = {
  */
 export type SelectedWebData = Record<string, string | undefined>;
 
-export type SelectionErrors = Record<string, string>;
+export type SelectionErrors = Record<string, string> | undefined;
 
-export type QueryResult = [SelectedWebData, SelectionErrors | undefined];
+export type QueryResult = [SelectedWebData, SelectionErrors];
 /**
  * Uses browser automation to open up a website and perform data queries with css
  */

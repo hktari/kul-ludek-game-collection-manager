@@ -105,7 +105,7 @@ export default class BoardGameGeekReader {
       .join("\n");
   }
 
-  _combineErrors(queryErrors: SelectionErrors): Record<string, string[]> {
+  _combineWithParseErrors(queryErrors: SelectionErrors): Record<string, string[]> {
     const parseErrorsObj = Object.fromEntries(this.parseErrors.entries());
     if (queryErrors) {
       return merge(parseErrorsObj, queryErrors);
@@ -124,9 +124,12 @@ export default class BoardGameGeekReader {
         ...this._getSelectorsForGame()
       );
 
+    const combinedErrors = this._combineWithParseErrors(queryErrors);
+    const errorsStr = this._errorsToString(combinedErrors);
+
     const gameResource: BoardGameGeekResource = {
       boardGameGeekId: gameId,
-      errors: this._combineErrors(queryErrors),
+      errors: errorsStr,
       ...this._parseDataIntoGame(websiteData),
     };
 
