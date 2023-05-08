@@ -11,13 +11,12 @@ import WebsiteInspector, {
 } from "./websiteInspector";
 import { parseMinAge, parseMinMaxPlayers } from "./boardGameGeekReader.util";
 import merge from "lodash/fp/merge";
+import BoardGameGeekReaderParser from "./boardGameGeekReaderParsers";
 
 export type BoardGameGeekResource = Partial<Game>;
 
 export default class BoardGameGeekReader {
   private websiteInspector: WebsiteInspector;
-  private parseErrors: Map<string, string[]> = new Map<string, string[]>();
-
   constructor(public baseUrl: string) {
     this.websiteInspector = new WebsiteInspector();
   }
@@ -57,61 +56,37 @@ export default class BoardGameGeekReader {
     ];
   }
 
-  private _performParseDataProperty(
-    propertyName: string,
-    parserFunction: VoidFunction
-  ) {
-    try {
-      parserFunction();
-    } catch (error: any) {
-      this.parseErrors.set(propertyName, error.toString());
-    }
-  }
-
-  private _parseDataIntoGame(websiteData: SelectedWebData) {
-    let minPlayers, maxPlayers;
-    if (websiteData.minMaxPlayers) {
-      const minMaxPlayersRaw = websiteData.minMaxPlayers;
-      this._performParseDataProperty("minMaxPlayers", () => {
-        [minPlayers, maxPlayers] = parseMinMaxPlayers(minMaxPlayersRaw);
-      });
-    }
-
-    let minAge;
-    if (websiteData.minAge) {
-      const minAgeRaw = websiteData.minAge;
-      this._performParseDataProperty("minAge", () => {
-        minAge = parseMinAge(minAgeRaw);
-      });
-    }
-
-    const game: Partial<BoardGameGeekResource> = {
-      title: websiteData.title,
-      description: websiteData.description,
-      minAge,
-      minPlayers,
-      maxPlayers,
-      genre: websiteData.categories,
-      publisher: websiteData.publisher,
-      releaseDateYear: websiteData.releaseDateYear,
-    };
-
-    return game;
-  }
-
   _errorsToString(errors: Record<string, string[]>) {
     return Object.entries(errors)
       .map((attr, err) => `${[attr]}: ${err}`)
       .join("\n");
   }
 
-  _combineWithParseErrors(queryErrors: SelectionErrors): Record<string, string[]> {
-    const parseErrorsObj = Object.fromEntries(this.parseErrors.entries());
-    if (queryErrors) {
-      return merge(parseErrorsObj, queryErrors);
-    } else {
-      return parseErrorsObj;
+  _combineErrors(
+    parseErrors: Record<string, string> | undefined,
+    queryErrors: SelectionErrors
+  ): Record<string, string[]> {
+    const combinedErrors: Record<string, string[]> = {};
+
+    if (parseErrors) {
+      for (const [propertyName, parseErrorMessage] of Object.entries(
+        parseErrors
+      )) {
+        combinedErrors[propertyName] = [parseErrorMessage];
+      }
     }
+
+    if (queryErrors) {
+      for (const [propertyName, queryErrorMessage] of Object.entries(
+        queryErrors
+      )) {
+        const errorsArr = combinedErrors[propertyName] || [];
+        errorsArr.push(queryErrorMessage);
+        combinedErrors[propertyName] = errorsArr;
+      }
+    }
+
+    return combinedErrors;
   }
 
   async getResourceForGameId(gameId: string): Promise<BoardGameGeekResource> {
@@ -124,13 +99,16 @@ export default class BoardGameGeekReader {
         ...this._getSelectorsForGame()
       );
 
-    const combinedErrors = this._combineWithParseErrors(queryErrors);
-    const errorsStr = this._errorsToString(combinedErrors);
+    const parser = new BoardGameGeekReaderParser();
+    const [partialGameResource, parseErrors] = parser.parse(websiteData);
+
+    const parseAndQueryErrors = this._combineErrors(parseErrors, queryErrors);
+    const errorsStr = this._errorsToString(parseAndQueryErrors);
 
     const gameResource: BoardGameGeekResource = {
       boardGameGeekId: gameId,
       errors: errorsStr,
-      ...this._parseDataIntoGame(websiteData),
+      ...partialGameResource,
     };
 
     this.websiteInspector.close();
