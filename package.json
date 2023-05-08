@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "npm run clean && jest",
+    "test": "npm run clean || true && jest",
     "start": "npm run build && node ./dist/index.js",
-    "clean": "find . -name \"*.xlsx\" | xargs -r rm"
+    "clean": "find . -name \"*.xlsx\" | xargs -r rm 2>/dev/null"
   },
   "keywords": [],
   "author": "",
